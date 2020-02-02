@@ -1,25 +1,16 @@
+#include "main.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <stdio.h>
 #include <ctype.h>
-#define ID 300
-#define NUM 301
-#define BEGIN 400
-#define END 401
 
-int lookahead = 0;
-int lineCnt = 0;
-int numLexeme = 0;
-std::ifstream input;
-//std::string line;
-
-void assignStmt()
+void LexerParse::assignStmt()
 {
 
 }
 
-int lexan()
+int LexerParse::lexan()
 {
 	std::cout << "test1\n";
 	while(true)
@@ -62,12 +53,41 @@ int lexan()
 	}
 }
 
-void readLine(std::string fileName)
+void LexerParse::AssignStmt()
+{
+	
+	 match(ID);
+	 if(lookahead != '=')
+	 {
+		 std::cerr << "syntax error";
+	 }
+	 else
+	 {
+		match(lookahead);
+		//expression
+		match(';');
+	 }
+}
+
+void LexerParse::match(int t)
+{
+	if(lookahead == t)
+	{
+		lookahead = lexan();
+	}
+	else
+	{
+		std::cerr << "syntax error";
+	}
+}
+
+void LexerParse::readLine(std::string fileName)
 {
 	input.open(fileName);
 
 	if(input.is_open())
 	{
+		std::cout << "going to lexan\n";
 		lexan();
 	}
 	else
@@ -85,7 +105,7 @@ void readLine(std::string fileName)
 	}*/
 }
 
-int main(int argc, char** argv)
+int LexerParse::main(int argc, char** argv)
 {
 	if(argc == 2)
 	{
