@@ -5,11 +5,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void LexerParse::assignStmt()
-{
-
-}
-
 int LexerParse::lexan()
 {
 	std::cout << "test1\n";
@@ -40,7 +35,16 @@ int LexerParse::lexan()
 		}
 		else if(isalpha(ch))
 		{
-			//do a thing??
+			/*
+			 * get identifier into value
+			 * type = lookup(value);
+			 * if(type == NOT_FOUND)
+			 * {
+			 *	insert value into symbolTable;
+			 * }
+			 * else
+			 * 	return type;
+			 */
 		}
 		else if(ch == EOF)
 		{
@@ -49,17 +53,17 @@ int LexerParse::lexan()
 		}
 		else
 		{
-			std::cout << "neither an alpha, digit, newline, eof, space, or tab.\n";
+			std::cout << "neither an alpha, digit, newline, eof, space, or tab.\n" << ch << "\n";
 			return ch;
 		}
 	}
 }
 
 void LexerParse::AssignStmt()
-{
-	
+{	
 	 match(ID);
-	 if(lookahead != '=')
+	 //61 == '='
+	 if(lookahead != 61)
 	 {
 		 std::cerr << "syntax error";
 	 }
@@ -83,14 +87,12 @@ void LexerParse::expression()
 
 void LexerParse::term()
 {
-	/*
-	 * factor();
-	 * while(lookahead == '*' || lookahead == '/')
-	 * {
-	 * 	match(lookahead);
-	 * 	factor();
-	 * }
-	 */
+	 factor();
+	 while(lookahead == '*' || lookahead == '/')
+	 {
+	 	match(lookahead);
+	 	factor();
+	 }
 }
 
 void LexerParse::factor()
@@ -134,7 +136,7 @@ void LexerParse::readLine(std::string fileName)
 	if(input.is_open())
 	{
 		std::cout << "going to lexan\n";
-		lexan();
+		std::cout << lexan() << "\n";
 	}
 	else
 	{
