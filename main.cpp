@@ -44,10 +44,12 @@ int LexerParse::lexan()
 		}
 		else if(ch == EOF)
 		{
+			std::cout << "reached end of file.\n";
 			return -1; //temp for DONE
 		}
 		else
 		{
+			std::cout << "neither an alpha, digit, newline, eof, space, or tab.\n";
 			return ch;
 		}
 	}
@@ -64,9 +66,53 @@ void LexerParse::AssignStmt()
 	 else
 	 {
 		match(lookahead);
-		//expression
+		expression();
 		match(';');
 	 }
+}
+
+void LexerParse::expression()
+{
+	term();
+	while(lookahead == '+' || lookahead == '-')
+	{
+	 	match(lookahead);
+	 	term();
+	}
+}
+
+void LexerParse::term()
+{
+	/*
+	 * factor();
+	 * while(lookahead == '*' || lookahead == '/')
+	 * {
+	 * 	match(lookahead);
+	 * 	factor();
+	 * }
+	 */
+}
+
+void LexerParse::factor()
+{
+	if(lookahead == ID)
+	{
+		match(ID);
+	}
+	else if(lookahead == NUM)
+	{
+		match(NUM);
+	}
+	else if(lookahead == '(')
+	{
+		match('(');
+		expression();
+		match(')');
+	}
+	else
+	{
+		std::cerr << "syntax error. Neither an ID, NUM, or (\n";
+	}
 }
 
 void LexerParse::match(int t)
@@ -77,7 +123,7 @@ void LexerParse::match(int t)
 	}
 	else
 	{
-		std::cerr << "syntax error";
+		std::cerr << "syntax error. Unable to match\n";
 	}
 }
 
@@ -92,7 +138,7 @@ void LexerParse::readLine(std::string fileName)
 	}
 	else
 	{
-		std::cout << "error opening " << fileName << "\n";
+		std::cerr << "error opening file.\n";
 		return;
 	}
 
@@ -105,10 +151,16 @@ void LexerParse::readLine(std::string fileName)
 	}*/
 }
 
-int LexerParse::main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	if(argc == 2)
 	{
-		readLine(argv[1]);
+		LexerParse* parse = new LexerParse();
+		parse->readLine(argv[1]);
 	}
+	else
+	{
+		std::cerr << "Error. No file name listed.\n";
+	}
+	return 0;
 }

@@ -24,9 +24,12 @@ public:
 	void assignStmt();
 	int lexan();
 	void AssignStmt();
+	void expression();
+	void term();
+	void factor();
 	void match(int t);
 	void readLine(std::string filename);
-	int main(int argc, char** argv);
+//	int main(int argc, char** argv);
 };
 
 #endif
