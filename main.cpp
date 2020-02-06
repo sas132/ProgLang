@@ -4,24 +4,26 @@
 #include <fstream>
 #include <stdio.h>
 #include <ctype.h>
+#include <cstring>
 
 int LexerParse::lexan()
 {
-	std::cout << "test1\n";
+	//std::cout << "test1\n";
+	std::string varName = "";
 	while(true)
 	{
-		std::cout << "test2\n";
+		//std::cout << "test2\n";
 		//std::cout << line << std::endl;
 		char ch;
 		input.get(ch);
-		std::cout << "test3\n";
+		//std::cout << "test3\n";
 		if(ch == ' ' || ch == '\t')
 		{
-			std::cout << "test6\n";
+			//std::cout << "test6\n";
 		}
 		else if(ch == '\n')
 		{
-			std::cout << "test7\n";
+			//std::cout << "test7\n";
 			lineCnt++;
 		}
 		else if(isdigit(ch))
@@ -29,27 +31,73 @@ int LexerParse::lexan()
 			std::cout << ch << std::endl;
 			std::cout << numLexeme << std::endl;
 			int numLexeme = atoi(&ch);
-			std::cout << "test5\n\n";
-			std::cout << numLexeme << " should be 1 " << std::endl;
+			//std::cout << "test5\n\n";
+			//std::cout << numLexeme << " should be 1 " << std::endl;
+
 			return NUM;
 		}
 		else if(isalpha(ch))
 		{
-			/*
-			 * get identifier into value
-			 * type = lookup(value);
-			 * if(type == NOT_FOUND)
-			 * {
-			 *	insert value into symbolTable;
-			 * }
-			 * else
-			 * 	return type;
-			 */
+			//std::cout << "testA\n";
+			char previous = ' ';
+			do{
+				//std::cout << "testB\t" << ch << "\n";
+				varName += ch;
+				previous = ch;
+				input.get(ch);
+			}while(isdigit(ch) || isalpha(ch) || (ch == '_' && previous != '_')); 
+
+			if(begun && strcmp(varName.c_str(), "end") == 0)
+			{
+				std::cout << "has ended\n\n";
+				ended = true;
+				return END;
+			}
+
+			if(begun && !ended)
+			{
+				int type = lookup(varName);
+				if(type == -1)
+				{
+					currentVar++;
+					insert(varName, ID);
+				}
+				std::cout << "\t\tvariable: " << varName << "\n";
+				return ID;
+			}
+			else if(strcmp(varName.c_str(), "begin") == 0)
+			{
+				std::cout << "has begun\n\n";
+				begun = true;
+				return BEGIN;
+			}
+			else
+			{
+				std::cerr << "Error: file does not properly begin.\n";
+				return -1;
+			}
 		}
 		else if(ch == EOF)
 		{
-			std::cout << "reached end of file.\n";
+			if(!ended)
+			{
+				std::cerr << "Error: file ended improperly. missing 'end.'\n";
+			}
+			else
+				std::cout << "reached end of file.\n";
 			return -1; //temp for DONE
+		}
+		else if(ch == '~')
+		{
+			std::cout << "comment: ";
+
+			while(ch != '\n')
+			{
+				std::cout << ch;
+				input.get(ch);
+			}
+
+			std::cout << "\n";
 		}
 		else
 		{
@@ -59,10 +107,35 @@ int LexerParse::lexan()
 	}
 }
 
+void LexerParse::insert(std::string name, int type)
+{
+	varNames[currentVar] = name;
+}
+
+int LexerParse::lookup(std::string value)
+{
+	int i = 0;
+
+	//std::cout << "made it to lookup\t" << sizeof(varNames) << std::endl;
+	while(i < 20)
+	{
+		std::cout << "\ti = " << i << std::endl;
+		if(strcmp(varNames[i].c_str(), value.c_str()) == 0)
+		{
+			std::cout << "returning " << varTypes[i];
+			return varTypes[i];
+		}
+		i++;		
+	}
+	std::cout << "never found.\n";
+	return -1;
+}
+
 void LexerParse::AssignStmt()
-{	
+{
+	// 61 == '='
+	
 	 match(ID);
-	 //61 == '='
 	 if(lookahead != 61)
 	 {
 		 std::cerr << "syntax error";
@@ -77,8 +150,11 @@ void LexerParse::AssignStmt()
 
 void LexerParse::expression()
 {
+	// 43 == '+'
+	// 45 == '-'
+
 	term();
-	while(lookahead == '+' || lookahead == '-')
+	while(lookahead == 43 || lookahead == 45)
 	{
 	 	match(lookahead);
 	 	term();
@@ -87,8 +163,11 @@ void LexerParse::expression()
 
 void LexerParse::term()
 {
+	// 42 == '*'
+	// 47 == '/'
+
 	 factor();
-	 while(lookahead == '*' || lookahead == '/')
+	 while(lookahead == 42 || lookahead == 47)
 	 {
 	 	match(lookahead);
 	 	factor();
@@ -97,6 +176,9 @@ void LexerParse::term()
 
 void LexerParse::factor()
 {
+	// 40 == '('
+	// 41 == ')'
+	
 	if(lookahead == ID)
 	{
 		match(ID);
@@ -105,11 +187,11 @@ void LexerParse::factor()
 	{
 		match(NUM);
 	}
-	else if(lookahead == '(')
+	else if(lookahead == 40)
 	{
-		match('(');
+		match(40);
 		expression();
-		match(')');
+		match(41);
 	}
 	else
 	{
@@ -135,22 +217,33 @@ void LexerParse::readLine(std::string fileName)
 
 	if(input.is_open())
 	{
+		begun = false;
+		ended = false;
+		currentVar = 0;
 		std::cout << "going to lexan\n";
-		std::cout << lexan() << "\n";
+		//std::cout << lexan() << "\n";
+
+		int returnState = 0;
+		while(returnState != -1 && returnState != 401)
+		{
+			returnState = lexan();
+			std::cout << "\tlexan: " << returnState << "\n";
+		}
 	}
 	else
 	{
 		std::cerr << "error opening file.\n";
 		return;
 	}
+}
 
-	/*while(!input.eof())
+void LexerParse::setArrays()
+{
+	for(int i = 0; i < 20; i++)
 	{
-		lexan();
-		std::cout << lineCnt << line << "\n";
-		getline(input, line);
-		//lexan();
-	}*/
+		varNames[i] = "";
+		varTypes[i] = 0;
+	}
 }
 
 int main(int argc, char** argv)

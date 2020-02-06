@@ -18,11 +18,19 @@ private:
 	int lookahead;
 	int lineCnt;
 	int numLexeme;
+	int currentVar;
+	bool begun;
+	bool ended;
 	std::ifstream input;
+	std::string varNames[20];
+	int varTypes[20];
+	int lookup(std::string value);
+	void setArrays();
 
 public:
 	void assignStmt();
 	int lexan();
+	void insert(std::string name, int type);
 	void AssignStmt();
 	void expression();
 	void term();
