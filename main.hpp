@@ -28,7 +28,6 @@ private:
 	void setArrays();
 
 public:
-	void assignStmt();
 	int lexan();
 	void insert(std::string name, int type);
 	void AssignStmt();
@@ -37,6 +36,7 @@ public:
 	void factor();
 	void match(int t);
 	void readLine(std::string filename);
+	void print();
 //	int main(int argc, char** argv);
 };
 
