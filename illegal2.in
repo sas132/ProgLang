@@ -1,0 +1,7 @@
+begin
+int a, b, c, hello;
+a = b;
+a = b+2;
+b = (c+hello) * (a - 5;
+end.
+
