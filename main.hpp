@@ -11,6 +11,7 @@
 #define NUM 301
 #define BEGIN 400
 #define END 401
+#define INT 500
 
 class LexerParse
 {
@@ -21,11 +22,13 @@ private:
 	int currentVar;
 	bool begun;
 	bool ended;
+	bool newValue;
 	std::ifstream input;
 	std::string varNames[20];
 	int varTypes[20];
 	int lookup(std::string value);
 	void setArrays();
+	void newInt();
 
 public:
 	int lexan();

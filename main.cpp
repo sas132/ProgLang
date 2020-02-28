@@ -40,7 +40,7 @@ int LexerParse::lexan()
 		{
 			char peeked = input.peek();
 			varName += ch;
-			while(isdigit(peeked) || isalpha(peeked) || peeked == '_')
+			while((isdigit(peeked) || isalpha(peeked) || peeked == '_') && peeked != ',')
 			{
 				input.get(ch);
 				varName += ch;
@@ -66,10 +66,26 @@ int LexerParse::lexan()
 				return END;
 			}
 
+			else if(begun && strcmp(varName.c_str(), "int") == 0)
+			{
+				newValue = true;
+				return INT;
+			}
+
 			else if(begun && !ended)
 			{
 				int type = lookup(varName);
-				if(type == -1)
+				if(!newValue && type == -1)
+				{
+					std::cerr << "Error: varible undeclared in line " << lineCnt << "\n";
+					exit(1);
+				}
+				else if(newValue && type != -1)
+				{
+					std::cerr << "Error: variable declared twice in line " << lineCnt << "\n";
+					exit(1);
+				}
+				else if(newValue)
 				{
 					insert(varName, ID);
 				}
@@ -105,10 +121,15 @@ int LexerParse::lexan()
 			}
 
 		}
+		else if(ch == ';')
+		{
+			newValue = false;
+			return ch;
+		}
 		else
 		{
-			char tempChar = input.peek();
-			lookahead = tempChar;
+			//char tempChar = input.peek();
+			//lookahead = tempChar;
 			return ch;
 		}
 	}
@@ -119,6 +140,29 @@ void LexerParse::insert(std::string name, int type)
 	varNames[currentVar] = name;
 	varTypes[currentVar] = type;
 	currentVar++;
+}
+
+void LexerParse::newInt()
+{
+	match(INT);
+	while(true)
+	{
+		//match(INT);
+		match(ID);
+		if(lookahead == ';')
+		{
+			match(';');
+			return;
+		}
+		else if(lookahead == ',')
+		{
+			match(',');
+		}
+		else
+		{
+			std::cerr << "Error: lack of semicolon or comma in line " << lineCnt << "\n";
+		}
+	}
 }
 
 int LexerParse::lookup(std::string value)
@@ -144,19 +188,28 @@ void LexerParse::AssignStmt()
 	{
 		return;
 	}
-	
-	 match(ID);
-	 if(lookahead != 61)
-	 {
-		 std::cerr << "syntax error, missing '=' in line " << lineCnt << "\n";
-		 exit(1);
-	 }
-	 else
-	 {
-		match(lookahead);
-		expression();
-		match(';');
-	 }
+
+	if(lookahead != 500)
+	{	
+	 	match(ID);
+	 	if(lookahead != 61)
+	 	{
+			std::cerr << "syntax error, missing '=' in line " << lineCnt << "\n";
+		 	exit(1);
+	 	}
+	 	else
+	 	{
+			match(lookahead);
+			expression();
+			match(';');
+	 	}
+	}
+	else
+	{
+		std::cout << "TESTER\n";
+		newInt();
+		//send to a function.
+	}
 }
 
 void LexerParse::expression()
