@@ -243,6 +243,18 @@ void LexerParse::expression()
 	term();
 	while(lookahead == 43 || lookahead == 45)
 	{
+		work[numWork] = "R" + std::to_string(numWork) + " ";
+		if(lookahead == 43)
+		{
+			work[numWork] += "+ ";
+		}
+		else
+		{
+			work[numWork] += "- ";
+		}
+		work[numWork] += "R" + std::to_string(numWork + 1);
+		numWork++;
+
 	 	match(lookahead);
 	 	term();
 	}
@@ -315,6 +327,7 @@ void LexerParse::readLine(std::string fileName)
 		while(input.is_open())
 		{
 			numVarUsed = 0;
+			numWork = 0;
 			for(int i = 0; i < 20; i++)
 			{
 				varUsed[i] = "NULL";
@@ -351,6 +364,10 @@ void LexerParse::print()
 	for(int i = 0; i < numVarUsed; i++)
 	{
 		std::cout << "R" << i << " = " << varUsed[i] << "\n";
+	}
+	for(int i = numWork - 1; i >= 0; i--)
+	{
+		std::cout << work[i] << "\n";
 	}
 }
 
