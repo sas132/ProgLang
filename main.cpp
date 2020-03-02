@@ -93,18 +93,13 @@ int LexerParse::lexan()
 				}
 				else if(strcmp(finalVar.c_str(), "_none") == 0)
 				{
-					std::cout << "varName: " << varName << "\n";
 					finalVar = varName;
-					std::cout << "finalVar: " << finalVar << "\n";
 				}
 				else
 				{
-					//insert var used here
 					varUsed[numVarUsed] = varName;
-					std::cout << "VARUSED: " << varUsed[numVarUsed] << "\n";
 					numVarUsed++;
 				}
-				//std::cout << "FINALVAR = " << finalVar << "\n";
 				return ID;
 			}
 			else if(strcmp(varName.c_str(), "begin") == 0)
@@ -142,13 +137,10 @@ int LexerParse::lexan()
 			newValue = false;
 			totalOutput[numOutput] = allValues();
 			numOutput++;
-			//finalVar = "NULL";
 			return ch;
 		}
 		else
 		{
-			//char tempChar = input.peek();
-			//lookahead = tempChar;
 			return ch;
 		}
 	}
@@ -156,18 +148,28 @@ int LexerParse::lexan()
 
 std::string LexerParse::allValues()
 {
+	if(strcmp(varUsed[0].c_str(), "NULL") == 0)
+	{
+		return "";
+	}
 	std::string temp = "";
+	char tempChar;
 
 	for(int i = 0; i < numVarUsed; i++)
 	{
-		temp += ("R" + std::to_string(i) + " = " + varUsed[i] + "\n");
+		tempChar = i;
+		temp += ("R" + std::to_string(tempChar) + " = " + varUsed[i] + "\n");
+		//tempChar = std::to_string(i);
 	}
-	for(int j = 0; j < numWork; j++)
+	if(numWork > 0)
 	{
-		char tempChar = work[j].at(1);
-		std::cout << tempChar << "\n";
-		temp += ("R" + std::string(&tempChar) + " = " + work[j] + "\nBITCH\n");
+		for(int j = 0; j < numWork; j++)
+		{
+			tempChar = work[j].at(1);
+			temp += ("R" + std::string(&tempChar) + " = " + work[j] + "\n");
+		}
 	}
+	temp += finalVar + " = R" + tempChar + "\n";
 	return temp;
 }
 
@@ -180,11 +182,9 @@ void LexerParse::insert(std::string name, int type)
 
 void LexerParse::newInt()
 {
-	std::cout << "TEST XYZ\n";
 	match(INT);
 	while(true)
 	{
-		//match(INT);
 		match(ID);
 		if(lookahead == ';')
 		{
@@ -219,9 +219,7 @@ int LexerParse::lookup(std::string value)
 
 void LexerParse::AssignStmt()
 {
-	// 61 == '='
-	//finalVar = "_none"; // can't start with underscore, good for testing
-	
+	// 61 == '='	
 	if(lookahead == 401)
 	{
 		return;
@@ -229,10 +227,7 @@ void LexerParse::AssignStmt()
 
 	if(lookahead != 500)
 	{	
-		//finalVar = "_none";
-		//std::cout << "TESTABC\n";
 	 	match(ID);
-		std::cout << "finalVar should be a: " << finalVar << "\n";
 	 	if(lookahead != 61)
 	 	{
 			std::cerr << "syntax error, missing '=' in line " << lineCnt << "\n";
@@ -244,15 +239,11 @@ void LexerParse::AssignStmt()
 			expression();
 			match(';');
 	 	}
-		std::cout << finalVar << "\n";
 	}
 	else
 	{
 		newInt();
 	}
-	//finalVar = "_none";
-
-	//std::cout << finalVar << "\n";
 }
 
 void LexerParse::expression()
@@ -326,12 +317,10 @@ void LexerParse::factor()
 		if(numWork > 0)
 		{
 			temp1 = work[numWork - 2].at(1);
-			std::cout << "TEST        " << temp1 << "\n";
 		}
 		expression();
 		if(numWork > 1)
 		{
-			std::cout << "TEST       " << work[numWork - 1] << "\n";
 			work[numWork - 2] = work[numWork - 1];
 			work[numWork - 1] = "R" + temp1 + " * R" + work[numWork - 1].at(1);
 		}
@@ -368,7 +357,6 @@ void LexerParse::readLine(std::string fileName)
 		ended = false;
 		currentVar = 0;
 		lexan();
-		//int temp = 0;
 		while(input.is_open())
 		{
 			numVarUsed = 0;
@@ -406,16 +394,6 @@ void LexerParse::print()
 		std::cout << " |\n";
 	}
 
-	/*for(int i = 0; i < numVarUsed; i++)
-	{
-		std::cout << "R" << i << " = " << varUsed[i] << "\n";
-	}
-	
-	//for(int i = numWork - 1; i >= 0; i--)
-	for(int i = 0; i < numWork; i++)
-	{
-		std::cout << work[i] << "\n";
-	}*/
 	for(int i = 0; i < numOutput; i++)
 	{
 		std::cout << totalOutput[i] << "\n";
