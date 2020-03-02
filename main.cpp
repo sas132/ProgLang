@@ -134,8 +134,12 @@ int LexerParse::lexan()
 		}
 		else if(ch == ';')
 		{
+			if(newValue == false)
+			{
+				totalOutput[numOutput] = allValues();
+			}
 			newValue = false;
-			totalOutput[numOutput] = allValues();
+			//totalOutput[numOutput] = allValues();
 			numOutput++;
 			return ch;
 		}
@@ -157,9 +161,8 @@ std::string LexerParse::allValues()
 
 	for(int i = 0; i < numVarUsed; i++)
 	{
-		tempChar = i;
-		temp += ("R" + std::to_string(tempChar) + " = " + varUsed[i] + "\n");
-		//tempChar = std::to_string(i);
+		tempChar = char(i);
+		temp += ("R" + std::to_string(i) + " = " + varUsed[i] + "\n");
 	}
 	if(numWork > 0)
 	{
