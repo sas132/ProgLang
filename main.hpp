@@ -22,6 +22,7 @@ private:
 	int currentVar;
 	int numVarUsed;
 	int numWork;
+	int numOutput;
 	bool begun;
 	bool ended;
 	bool newValue;
@@ -35,6 +36,7 @@ private:
 	int lookup(std::string value);
 	void setArrays();
 	void newInt();
+	std::string allValues();
 
 public:
 	int lexan();

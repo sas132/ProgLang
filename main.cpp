@@ -140,6 +140,9 @@ int LexerParse::lexan()
 		else if(ch == ';')
 		{
 			newValue = false;
+			totalOutput[numOutput] = allValues();
+			numOutput++;
+			//finalVar = "NULL";
 			return ch;
 		}
 		else
@@ -149,6 +152,23 @@ int LexerParse::lexan()
 			return ch;
 		}
 	}
+}
+
+std::string LexerParse::allValues()
+{
+	std::string temp = "";
+
+	for(int i = 0; i < numVarUsed; i++)
+	{
+		temp += ("R" + std::to_string(i) + " = " + varUsed[i] + "\n");
+	}
+	for(int j = 0; j < numWork; j++)
+	{
+		char tempChar = work[j].at(1);
+		std::cout << tempChar << "\n";
+		temp += ("R" + std::string(&tempChar) + " = " + work[j] + "\nBITCH\n");
+	}
+	return temp;
 }
 
 void LexerParse::insert(std::string name, int type)
@@ -268,6 +288,18 @@ void LexerParse::term()
 	 factor();
 	 while(lookahead == 42 || lookahead == 47)
 	 {
+		work[numWork] = "R" + std::to_string(numWork) + " ";
+		if(lookahead == 42)
+		{
+			work[numWork] += "* ";
+		}
+		else
+		{
+			work[numWork] += "/ ";
+		}
+		work[numWork] += "R" + std::to_string(numWork + 1);
+		numWork++;
+
 	 	match(lookahead);
 	 	factor();
 	 }
@@ -288,8 +320,21 @@ void LexerParse::factor()
 	}
 	else if(lookahead == 40)
 	{
+		std::string temp1;
+		std::string temp2;
 		match(40);
+		if(numWork > 0)
+		{
+			temp1 = work[numWork - 2].at(1);
+			std::cout << "TEST        " << temp1 << "\n";
+		}
 		expression();
+		if(numWork > 1)
+		{
+			std::cout << "TEST       " << work[numWork - 1] << "\n";
+			work[numWork - 2] = work[numWork - 1];
+			work[numWork - 1] = "R" + temp1 + " * R" + work[numWork - 1].at(1);
+		}
 		match(41);
 	}
 	else
@@ -361,13 +406,19 @@ void LexerParse::print()
 		std::cout << " |\n";
 	}
 
-	for(int i = 0; i < numVarUsed; i++)
+	/*for(int i = 0; i < numVarUsed; i++)
 	{
 		std::cout << "R" << i << " = " << varUsed[i] << "\n";
 	}
-	for(int i = numWork - 1; i >= 0; i--)
+	
+	//for(int i = numWork - 1; i >= 0; i--)
+	for(int i = 0; i < numWork; i++)
 	{
 		std::cout << work[i] << "\n";
+	}*/
+	for(int i = 0; i < numOutput; i++)
+	{
+		std::cout << totalOutput[i] << "\n";
 	}
 }
 
