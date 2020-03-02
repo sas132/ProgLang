@@ -89,11 +89,18 @@ int LexerParse::lexan()
 				{
 					insert(varName, ID);
 				}
+				else if(strcmp(finalVar.c_str(), "_none") == 0)
+				{
+					std::cout << "varName: " << varName << "\n";
+					finalVar = varName;
+					std::cout << "finalVar: " << finalVar << "\n";
+				}
+				std::cout << "FINALVAR = " << finalVar << "\n";
 				return ID;
 			}
 			else if(strcmp(varName.c_str(), "begin") == 0)
 			{
-				insert("begin", BEGIN);
+				//insert("begin", BEGIN);
 				begun = true;
 				lookahead = lexan();
 				return lookahead;
@@ -144,6 +151,7 @@ void LexerParse::insert(std::string name, int type)
 
 void LexerParse::newInt()
 {
+	std::cout << "TEST XYZ\n";
 	match(INT);
 	while(true)
 	{
@@ -183,6 +191,7 @@ int LexerParse::lookup(std::string value)
 void LexerParse::AssignStmt()
 {
 	// 61 == '='
+	//finalVar = "_none"; // can't start with underscore, good for testing
 	
 	if(lookahead == 401)
 	{
@@ -191,7 +200,10 @@ void LexerParse::AssignStmt()
 
 	if(lookahead != 500)
 	{	
+		//finalVar = "_none";
+		//std::cout << "TESTABC\n";
 	 	match(ID);
+		std::cout << "finalVar should be a: " << finalVar << "\n";
 	 	if(lookahead != 61)
 	 	{
 			std::cerr << "syntax error, missing '=' in line " << lineCnt << "\n";
@@ -203,13 +215,15 @@ void LexerParse::AssignStmt()
 			expression();
 			match(';');
 	 	}
+		std::cout << finalVar << "\n";
 	}
 	else
 	{
-		std::cout << "TESTER\n";
 		newInt();
-		//send to a function.
 	}
+	//finalVar = "_none";
+
+	//std::cout << finalVar << "\n";
 }
 
 void LexerParse::expression()
@@ -283,13 +297,20 @@ void LexerParse::readLine(std::string fileName)
 
 	if(input.is_open())
 	{
+		finalVar = "_none";
+		//finalVar = "_none";
 		begun = false;
 		ended = false;
 		currentVar = 0;
 		lexan();
+		int temp = 0;
 		while(input.is_open())
 		{
+			std::cout << "TESTABC " << temp << "\n";
+			temp++;
+			//finalVar = "_none";
 			AssignStmt();
+			//finalVar = "_none";
 		}
 		print();
 	}

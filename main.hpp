@@ -25,6 +25,10 @@ private:
 	bool newValue;
 	std::ifstream input;
 	std::string varNames[20];
+	std::string varUsed[20];
+	std::string work[20];
+	std::string totalOutput[20];
+	std::string finalVar;
 	int varTypes[20];
 	int lookup(std::string value);
 	void setArrays();
