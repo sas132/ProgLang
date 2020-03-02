@@ -20,6 +20,8 @@ private:
 	int lineCnt;
 	int numLexeme;
 	int currentVar;
+	int numVarUsed;
+	int numWork;
 	bool begun;
 	bool ended;
 	bool newValue;

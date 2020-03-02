@@ -24,7 +24,7 @@ int LexerParse::lexan()
 		}
 		else if(isdigit(ch))
 		{
-			int numLexeme = 0;
+			int numLexeme = atoi(&ch);
 			char tempChar = input.peek();
 
 			while(isdigit(tempChar))
@@ -34,6 +34,8 @@ int LexerParse::lexan()
 				tempChar = input.peek();
 			}
 			insert(std::to_string(numLexeme), NUM);
+			varUsed[numVarUsed] = std::to_string(numLexeme);
+			numVarUsed++;
 			return NUM;
 		}
 		else if(isalpha(ch))
@@ -95,7 +97,14 @@ int LexerParse::lexan()
 					finalVar = varName;
 					std::cout << "finalVar: " << finalVar << "\n";
 				}
-				std::cout << "FINALVAR = " << finalVar << "\n";
+				else
+				{
+					//insert var used here
+					varUsed[numVarUsed] = varName;
+					std::cout << "VARUSED: " << varUsed[numVarUsed] << "\n";
+					numVarUsed++;
+				}
+				//std::cout << "FINALVAR = " << finalVar << "\n";
 				return ID;
 			}
 			else if(strcmp(varName.c_str(), "begin") == 0)
@@ -298,19 +307,20 @@ void LexerParse::readLine(std::string fileName)
 	if(input.is_open())
 	{
 		finalVar = "_none";
-		//finalVar = "_none";
 		begun = false;
 		ended = false;
 		currentVar = 0;
 		lexan();
-		int temp = 0;
+		//int temp = 0;
 		while(input.is_open())
 		{
-			std::cout << "TESTABC " << temp << "\n";
-			temp++;
-			//finalVar = "_none";
+			numVarUsed = 0;
+			for(int i = 0; i < 20; i++)
+			{
+				varUsed[i] = "NULL";
+				work[i] = "NULL";
+			}
 			AssignStmt();
-			//finalVar = "_none";
 		}
 		print();
 	}
@@ -336,6 +346,11 @@ void LexerParse::print()
 		std::cout.width(4);
 		std::cout << std::setfill('-') << std::left << varTypes[i];
 		std::cout << " |\n";
+	}
+
+	for(int i = 0; i < numVarUsed; i++)
+	{
+		std::cout << "R" << i << " = " << varUsed[i] << "\n";
 	}
 }
 
